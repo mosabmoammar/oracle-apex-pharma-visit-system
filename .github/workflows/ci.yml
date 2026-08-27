@@ -1,0 +1,83 @@
+# Installs the schema on a real Oracle database and runs the business-rule
+# test suite on every push. A green badge means the claims in the README are
+# verified continuously, not asserted once.
+#
+# Scope: the database layer only. APEX is not installed in CI; the application
+# layer is verified by importing the export into a workspace.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  database:
+    name: Schema, seed and business-rule tests
+    runs-on: ubuntu-latest
+
+    services:
+      oracle:
+        image: gvenzl/oracle-free:23-slim-faststart
+        env:
+          ORACLE_PASSWORD: ci_password_1
+          ORACLE_CHARACTERSET: AL32UTF8
+        ports:
+          - 1521:1521
+        options: >-
+          --health-cmd healthcheck.sh
+          --health-interval 20s
+          --health-timeout 10s
+          --health-retries 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install SQLcl
+        run: |
+          curl -sL -o sqlcl.zip https://download.oracle.com/otn_software/java/sqldeveloper/sqlcl-latest.zip
+          unzip -q sqlcl.zip
+          echo "$PWD/sqlcl/bin" >> $GITHUB_PATH
+
+      - name: Verify character set
+        run: |
+          sql -S sys/ci_password_1@localhost:1521/FREEPDB1 as sysdba <<'SQL'
+            set heading off feedback off
+            select value from nls_database_parameters where parameter = 'NLS_CHARACTERSET';
+            exit
+          SQL
+
+      - name: Create application schema
+        run: |
+          sql -S sys/ci_password_1@localhost:1521/FREEPDB1 as sysdba <<'SQL'
+            create user pvs identified by ci_password_1 quota unlimited on users;
+            grant create session, create table, create view, create sequence,
+                  create procedure, create trigger, create type, create job,
+                  create materialized view, create synonym to pvs;
+            grant create any context, drop any context to pvs;
+            grant execute on dbms_session   to pvs;
+            grant execute on dbms_scheduler to pvs;
+            grant execute on dbms_mview     to pvs;
+            exit
+          SQL
+
+      - name: Install schema, load seed data and run tests
+        run: sql -S pvs/ci_password_1@localhost:1521/FREEPDB1 @install.sql
+
+      - name: Report test results
+        if: always()
+        run: |
+          sql -S pvs/ci_password_1@localhost:1521/FREEPDB1 <<'SQL'
+            set pagesize 200 linesize 200
+            column test_name format a60
+            select suite, test_name, passed from test_results order by suite, result_id;
+            exit
+          SQL

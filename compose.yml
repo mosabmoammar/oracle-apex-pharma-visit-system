@@ -1,0 +1,52 @@
+# Pharma Visit System — local development stack
+#
+#   docker compose up -d          start
+#   docker compose logs -f ords   watch the first-time APEX installation
+#   docker compose stop           stop, keeping all data
+#   docker compose down -v        destroy everything, including data
+#
+# Before the first run:
+#   1. accept the image licences at container-registry.oracle.com
+#      (Database -> free, and Database -> ords-developer)
+#   2. docker login container-registry.oracle.com
+#   3. create ords_secrets/conn_string.txt (see README)
+#
+# The memory settings below are tuned for a machine with 8 GB of RAM.
+# Remove INIT_SGA_SIZE / INIT_PGA_SIZE / mem_limit on a larger machine.
+
+services:
+  db:
+    image: container-registry.oracle.com/database/free:latest
+    container_name: pvs-db
+    hostname: database
+    ports:
+      - "1521:1521"
+    environment:
+      - ORACLE_PWD=YourStrongPwd1
+      - ORACLE_CHARACTERSET=AL32UTF8    # required for Arabic — do not change
+      - INIT_SGA_SIZE=1536
+      - INIT_PGA_SIZE=512
+    mem_limit: 3g
+    volumes:
+      - ./oracle_oradata/:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "sqlplus", "-L", "sys/YourStrongPwd1@//localhost:1521/FREEPDB1", "as", "sysdba", "@/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 30
+      start_period: 120s
+    restart: unless-stopped
+
+  ords:
+    image: container-registry.oracle.com/database/ords-developer:latest
+    container_name: pvs-ords
+    ports:
+      - "8181:8181"
+    volumes:
+      - ./ords_secrets/:/opt/oracle/variables
+      - ./ords_config/:/etc/ords/config/
+    mem_limit: 1g
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
