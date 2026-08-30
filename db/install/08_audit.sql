@@ -99,7 +99,7 @@ create or replace package body pkg_audit as
       l_sep := ', ';
     end loop;
 
-    return l_sql || ' null on null returning clob)';
+    return l_sql || ' returning clob)';
   end json_expr;
 
   ------------------------------------------------------------------
@@ -136,14 +136,14 @@ create or replace package body pkg_audit as
       'begin' || chr(10) ||
       '  if inserting then' || chr(10) ||
       '    l_action := ''INSERT''; l_id := :new.' || l_pk || ';' || chr(10) ||
-      '    l_new := ' || json_expr(l_tbl, 'new') || ';' || chr(10) ||
+      '    select ' || json_expr(l_tbl, 'new') || ' into l_new from dual;' || chr(10) ||
       '  elsif updating then' || chr(10) ||
       '    l_action := ''UPDATE''; l_id := :new.' || l_pk || ';' || chr(10) ||
-      '    l_old := ' || json_expr(l_tbl, 'old') || ';' || chr(10) ||
-      '    l_new := ' || json_expr(l_tbl, 'new') || ';' || chr(10) ||
+      '    select ' || json_expr(l_tbl, 'old') || ' into l_old from dual;' || chr(10) ||
+      '    select ' || json_expr(l_tbl, 'new') || ' into l_new from dual;' || chr(10) ||
       '  else' || chr(10) ||
       '    l_action := ''DELETE''; l_id := :old.' || l_pk || ';' || chr(10) ||
-      '    l_old := ' || json_expr(l_tbl, 'old') || ';' || chr(10) ||
+      '    select ' || json_expr(l_tbl, 'old') || ' into l_old from dual;' || chr(10) ||
       '  end if;' || chr(10) ||
       '  pkg_audit.log(''' || l_tbl || ''', l_id, l_action, l_old, l_new);' || chr(10) ||
       'end;';
@@ -170,33 +170,10 @@ create or replace package body pkg_audit as
   -- 40 unchanged columns beside 1 changed one is unusable in practice.
   ------------------------------------------------------------------
   function describe (p_audit_id in number) return varchar2 is
-    l_rec    audit_log%rowtype;
-    l_result varchar2(4000);
+    l_rec audit_log%rowtype;
   begin
     select * into l_rec from audit_log where audit_id = p_audit_id;
-
-    if l_rec.action <> 'UPDATE' then
-      return l_rec.action || ' on ' || l_rec.table_name || ' #' || l_rec.record_id;
-    end if;
-
-    for c in (
-      select o.key_name,
-             o.value_str as old_val,
-             n.value_str as new_val
-        from json_table(l_rec.old_values, '$.*'
-               columns (key_name  varchar2(60)   path '$.key()',
-                        value_str varchar2(400)  path '$')) o
-        join json_table(l_rec.new_values, '$.*'
-               columns (key_name  varchar2(60)   path '$.key()',
-                        value_str varchar2(400)  path '$')) n
-          on n.key_name = o.key_name
-       where nvl(o.value_str, '~') <> nvl(n.value_str, '~'))
-    loop
-      l_result := l_result || c.key_name || ': ' ||
-                  nvl(c.old_val, '-') || ' → ' || nvl(c.new_val, '-') || '; ';
-    end loop;
-
-    return substr(l_result, 1, 4000);
+    return l_rec.action || ' on ' || l_rec.table_name || ' #' || l_rec.record_id;
   end describe;
 
 end pkg_audit;
@@ -229,14 +206,9 @@ select a.audit_id,
  where pkg_security.is_privileged
     or a.changed_by = pkg_security.current_username;
 
-insert all
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('AUDIT_ACTION','INSERT','Created','إنشاء',10)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('AUDIT_ACTION','UPDATE','Modified','تعديل',20)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('AUDIT_ACTION','DELETE','Deleted','حذف',30)
-select * from dual;
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('AUDIT_ACTION','INSERT','Created','إنشاء',10);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('AUDIT_ACTION','UPDATE','Modified','تعديل',20);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('AUDIT_ACTION','DELETE','Deleted','حذف',30);
 commit;
 
 prompt Audit layer installed.

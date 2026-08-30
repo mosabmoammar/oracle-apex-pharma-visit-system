@@ -35,16 +35,10 @@ end;
 --------------------------------------------------------------------------------
 -- 1. Roles
 --------------------------------------------------------------------------------
-insert all
-  into roles (role_code, role_name_en, role_name_ar)
-       values ('REP','Medical Representative','مندوب طبي')
-  into roles (role_code, role_name_en, role_name_ar)
-       values ('SUPERVISOR','Area Supervisor','مشرف منطقة')
-  into roles (role_code, role_name_en, role_name_ar)
-       values ('SALES_MANAGER','Sales Manager','مدير المبيعات')
-  into roles (role_code, role_name_en, role_name_ar)
-       values ('SYS_ADMIN','System Administrator','مسؤول النظام')
-select * from dual;
+insert into roles (role_code, role_name_en, role_name_ar) values ('REP','Medical Representative','مندوب طبي');
+insert into roles (role_code, role_name_en, role_name_ar) values ('SUPERVISOR','Area Supervisor','مشرف منطقة');
+insert into roles (role_code, role_name_en, role_name_ar) values ('SALES_MANAGER','Sales Manager','مدير المبيعات');
+insert into roles (role_code, role_name_en, role_name_ar) values ('SYS_ADMIN','System Administrator','مسؤول النظام');
 
 --------------------------------------------------------------------------------
 -- 2. Regions — 3 parents, 3 territories each
@@ -372,11 +366,11 @@ end;
 -- 12. Volume report
 --------------------------------------------------------------------------------
 declare
+  l_n number;
   procedure show (p_label in varchar2, p_count in number) is
   begin
     dbms_output.put_line(rpad(p_label, 28, '.') || ' ' || to_char(p_count, '999,999'));
   end;
-  l_n number;
 begin
   dbms_output.put_line('--- Pharma Visit System seed volumes ---');
   select count(*) into l_n from regions;             show('regions', l_n);

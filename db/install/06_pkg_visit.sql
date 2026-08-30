@@ -428,16 +428,25 @@ create or replace package body pkg_visit as
                        quantity   number       path '$.quantity',
                        client_ref varchar2(64) path '$.client_ref')))
             loop
-              pkg_sample.dispense(
-                p_rep_user_id => nvl(j.rep_user_id,
-                                     (select rep_user_id from visits where visit_id = l_visit_id)),
-                p_batch_id    => s.batch_id,
-                p_visit_id    => l_visit_id,
-                p_doctor_id   => nvl(j.doctor_id,
-                                     (select doctor_id from visits where visit_id = l_visit_id)),
-                p_quantity    => s.quantity,
-                p_client_ref  => s.client_ref,
-                p_trx_id      => l_trx_id);
+              declare
+                l_rep number := j.rep_user_id;
+                l_doc number := j.doctor_id;
+              begin
+                if l_rep is null or l_doc is null then
+                  select rep_user_id, doctor_id
+                    into l_rep, l_doc
+                    from visits where visit_id = l_visit_id;
+                end if;
+
+                pkg_sample.dispense(
+                  p_rep_user_id => l_rep,
+                  p_batch_id    => s.batch_id,
+                  p_visit_id    => l_visit_id,
+                  p_doctor_id   => l_doc,
+                  p_quantity    => s.quantity,
+                  p_client_ref  => s.client_ref,
+                  p_trx_id      => l_trx_id);
+              end;
             end loop;
           end if;
 

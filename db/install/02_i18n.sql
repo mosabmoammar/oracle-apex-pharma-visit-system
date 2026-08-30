@@ -96,62 +96,49 @@ create table domain_values (
 comment on table domain_values is
   'Bilingual labels for coded domains (visit outcome, plan status, transaction type...). Feeds every LOV; no hard-coded display strings in APEX.';
 
-insert all
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('VISIT_OUTCOME','COMPLETED','Completed','منفّذة',10)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('VISIT_OUTCOME','NOT_AVAILABLE','Doctor unavailable','الطبيب غير متاح',20)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('VISIT_OUTCOME','POSTPONED','Postponed','مؤجّلة',30)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('VISIT_OUTCOME','CANCELLED','Cancelled','ملغاة',40)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('PLAN_STATUS','DRAFT','Draft','مسودة',10)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('PLAN_STATUS','SUBMITTED','Submitted','مُرسلة للاعتماد',20)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('PLAN_STATUS','APPROVED','Approved','معتمدة',30)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('PLAN_STATUS','REJECTED','Rejected','مرفوضة',40)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('TRX_TYPE','RECEIPT','Stock receipt','استلام مخزون',10)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('TRX_TYPE','DISPENSE','Dispensed to doctor','صرف للطبيب',20)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('TRX_TYPE','RETURN','Returned to warehouse','إرجاع للمستودع',30)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('TRX_TYPE','ADJUSTMENT','Adjustment','تسوية',40)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('TRX_TYPE','EXPIRY_WRITE_OFF','Expiry write-off','إتلاف لانتهاء الصلاحية',50)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('DOCTOR_TIER','A','Tier A','الفئة أ',10)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('DOCTOR_TIER','B','Tier B','الفئة ب',20)
-  into domain_values (domain_code, value_code, label_en, label_ar, sort_order)
-       values ('DOCTOR_TIER','C','Tier C','الفئة ج',30)
-select * from dual;
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('VISIT_OUTCOME','COMPLETED','Completed','منفّذة',10);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('VISIT_OUTCOME','NOT_AVAILABLE','Doctor unavailable','الطبيب غير متاح',20);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('VISIT_OUTCOME','POSTPONED','Postponed','مؤجّلة',30);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('VISIT_OUTCOME','CANCELLED','Cancelled','ملغاة',40);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('PLAN_STATUS','DRAFT','Draft','مسودة',10);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('PLAN_STATUS','SUBMITTED','Submitted','مُرسلة للاعتماد',20);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('PLAN_STATUS','APPROVED','Approved','معتمدة',30);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('PLAN_STATUS','REJECTED','Rejected','مرفوضة',40);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('TRX_TYPE','RECEIPT','Stock receipt','استلام مخزون',10);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('TRX_TYPE','DISPENSE','Dispensed to doctor','صرف للطبيب',20);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('TRX_TYPE','RETURN','Returned to warehouse','إرجاع للمستودع',30);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('TRX_TYPE','ADJUSTMENT','Adjustment','تسوية',40);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('TRX_TYPE','EXPIRY_WRITE_OFF','Expiry write-off','إتلاف لانتهاء الصلاحية',50);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('DOCTOR_TIER','A','Tier A','الفئة أ',10);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('DOCTOR_TIER','B','Tier B','الفئة ب',20);
+insert into domain_values (domain_code, value_code, label_en, label_ar, sort_order) values ('DOCTOR_TIER','C','Tier C','الفئة ج',30);
 commit;
 
 --------------------------------------------------------------------------------
 -- 5. Error catalogue (bilingual)
 --------------------------------------------------------------------------------
-insert all
-  into error_messages values (20001,'Your session context is not initialised. Please sign in again.','لم تتم تهيئة جلسة المستخدم. يرجى تسجيل الدخول مجددًا.')
-  into error_messages values (20002,'You are not authorised to access this record.','لا تملك صلاحية الوصول إلى هذا السجل.')
-  into error_messages values (20003,'The accounting period is closed and cannot be modified.','الفترة مغلقة ولا يمكن التعديل عليها.')
-  into error_messages values (20004,'This visit overlaps another visit for the same representative.','هذه الزيارة تتعارض زمنيًا مع زيارة أخرى لنفس المندوب.')
-  into error_messages values (20005,'An approved plan cannot be modified without an approved change request.','لا يمكن تعديل خطة معتمدة دون طلب تعديل معتمد.')
-  into error_messages values (20006,'Insufficient sample stock for this batch.','الرصيد غير كافٍ من هذه التشغيلة.')
-  into error_messages values (20007,'Dispensing would exceed the monthly ceiling for this doctor and product.','الكمية تتجاوز السقف الشهري المسموح لهذا الطبيب وهذا المنتج.')
-  into error_messages values (20008,'The batch has expired and cannot be dispensed.','التشغيلة منتهية الصلاحية ولا يمكن صرفها.')
-  into error_messages values (20009,'The product is inactive or suspended.','المنتج غير فعّال أو موقوف.')
-  into error_messages values (20010,'The visit date cannot be in the future.','لا يمكن أن يكون تاريخ الزيارة في المستقبل.')
-  into error_messages values (20011,'A target already exists for this representative, product and period.','يوجد هدف مسجل مسبقًا لنفس المندوب والمنتج والفترة.')
-  into error_messages values (20012,'Quantity must be greater than zero.','يجب أن تكون الكمية أكبر من صفر.')
-select * from dual;
+
 commit;
 
+-----------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- 5. Error catalogue (bilingual)
+--------------------------------------------------------------------------------
+insert into error_messages values (20001,'Your session context is not initialised. Please sign in again.','لم تتم تهيئة جلسة المستخدم. يرجى تسجيل الدخول مجددًا.');
+insert into error_messages values (20002,'You are not authorised to access this record.','لا تملك صلاحية الوصول إلى هذا السجل.');
+insert into error_messages values (20003,'The accounting period is closed and cannot be modified.','الفترة مغلقة ولا يمكن التعديل عليها.');
+insert into error_messages values (20004,'This visit overlaps another visit for the same representative.','هذه الزيارة تتعارض زمنيًا مع زيارة أخرى لنفس المندوب.');
+insert into error_messages values (20005,'An approved plan cannot be modified without an approved change request.','لا يمكن تعديل خطة معتمدة دون طلب تعديل معتمد.');
+insert into error_messages values (20006,'Insufficient sample stock for this batch.','الرصيد غير كافٍ من هذه التشغيلة.');
+insert into error_messages values (20007,'Dispensing would exceed the monthly ceiling for this doctor and product.','الكمية تتجاوز السقف الشهري المسموح لهذا الطبيب وهذا المنتج.');
+insert into error_messages values (20008,'The batch has expired and cannot be dispensed.','التشغيلة منتهية الصلاحية ولا يمكن صرفها.');
+insert into error_messages values (20009,'The product is inactive or suspended.','المنتج غير فعّال أو موقوف.');
+insert into error_messages values (20010,'The visit date cannot be in the future.','لا يمكن أن يكون تاريخ الزيارة في المستقبل.');
+insert into error_messages values (20011,'A target already exists for this representative, product and period.','يوجد هدف مسجل مسبقًا لنفس المندوب والمنتج والفترة.');
+insert into error_messages values (20012,'Quantity must be greater than zero.','يجب أن تكون الكمية أكبر من صفر.');
+commit;
+
+---------
 -- 6. PKG_I18N — single point of language resolution
 --------------------------------------------------------------------------------
 create or replace package pkg_i18n as

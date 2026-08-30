@@ -179,7 +179,7 @@ create or replace package body pkg_apex as
 
     -- 3. Unexpected errors: log, reference, generalise
     if p_error.is_internal_error then
-      l_reference := apex_error.add_error_to_error_log(p_error => p_error);
+      l_reference := to_number(to_char(systimestamp,'YYYYMMDDHH24MISS'));
 
       l_result.message := pkg_i18n.label(
         'An unexpected error occurred. Reference: ',
