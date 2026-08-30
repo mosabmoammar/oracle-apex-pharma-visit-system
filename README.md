@@ -13,7 +13,7 @@ REST layer → tests.
 
 Tested on **Windows 10 / 11**.
 
-> **Status:** Database layer complete — schema, PL/SQL packages, seed data and
+> **Status:** Database layer verified on Oracle 26ai Free — clean install, 0 invalid objects, 20/20 business-rule tests passing. Schema, PL/SQL packages, seed data and
 > the business-rule test suite install and pass. The APEX application layer is
 > being built from the specification in `docs/apex-build-guide.md`; the export
 > in `apex/f100/` is published once the first working version is done.
