@@ -688,9 +688,7 @@ document from any client engagement was used in building it.
 **Mosab N. R. Abumoammar** — Oracle APEX Developer
 Khan Yunis, Gaza, Palestine
 
-[GitHub](https://github.com/mosabmoammar) ·
-[LinkedIn](https://linkedin.com/in/mosabmoammar) ·
-mosab.abumoammar@gmail.com
+[GitHub](https://github.com/mosabmoammar)
 
 ## License
 
